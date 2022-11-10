@@ -107,14 +107,12 @@ int main(int argc, char const *argv[])
             Mat gray;
             cvtColor(frame, gray, COLOR_BGR2GRAY);
             Mat histImg(512, 1024, CV_8UC1, Scalar(0, 0, 0));
-            Mat histImg1(1024, 1024, CV_8UC1, Scalar(0, 0, 0));
+            Mat histImg1(512, 1024, CV_8UC1, Scalar(0, 0, 0));
             Mat outImg = gray.clone();
             if (equalized)
                 equalizeHist(gray, outImg);
             make_hist_image(outImg, histImg);
-            make_hist_image(outImg, histImg1);
             imshow("hist", histImg);
-            imshow("hist1", histImg1);
             imshow("frame", outImg);
             timeNow = system_clock::now();
             auto endTime = duration_cast<milliseconds>(timeNow.time_since_epoch()).count();
