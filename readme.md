@@ -118,16 +118,23 @@ def make_hist_image(src, hist_w, hist_h, hist_size):
 * Необходимо создать папку `samples` в корне репозитория и поместить в нее видеоролик формата mp4 с именем `1.mp4`
 
 * Для запуска реализации на Python с использованием OpenCV:
+
 `python3 hist_equalizer_py/hist_equalizer.py`
 
 * Для запуска реализации на Python без использования OpenCV:
+
 `python3 hist_equalizer_py_wo_opencv/hist_equalizer.py`
 
 * Для запуска реализации на С++ на Linux:
+
 `cd hist_equalizer_cpp_wo_opencv`
+
 `mkdir build && cd build`
+
 `cmake ..`
+
 `make`
+
 `./hist_equalizer`
 
 Во всех реализациях для включения эквализации необходимо нажать клавишу `e`, для выхода - `q`
