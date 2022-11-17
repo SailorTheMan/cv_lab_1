@@ -47,7 +47,7 @@ static void equalizeHist(Mat& source, Mat& dst)
     calcHist(source, 256, histArray);
     double cdfArray[256];
     makeCDF(256, histArray, 256, cdfArray);
-    double equalizedHist[256];
+    double eMap[256];
     double cdf_min = 0.f;
     int rows = source.rows, cols = source.cols;
     for (int i = 0; i < 256; i++)
@@ -58,11 +58,11 @@ static void equalizeHist(Mat& source, Mat& dst)
         }
     double k = 255.0f / (double)(rows*cols - cdf_min);
     for (int i = 0; i < 256; i++)
-        equalizedHist[i] = (k * (cdfArray[i] - cdf_min));
+        eMap[i] = (k * (cdfArray[i] - cdf_min));
     for (int y = 0; y < rows; y++)
         for (int x = 0; x < cols; x++)
         {
-            int value = (int)equalizedHist[(int)source.at<uchar>(y, x)];
+            int value = (int)eMap[(int)source.at<uchar>(y, x)];
             // uchar value = 255;
             dst.at<uchar>(y, x) = value;
         }
@@ -86,6 +86,8 @@ static void make_hist_image(Mat& src, Mat& histImage)
 
 int main(int argc, char const *argv[])
 {
+    long int frame_counter_equalized = 0;
+    long int overall_time_equalized = 0;
     bool not_terminated = true;
     bool equalized = false;
     while(not_terminated)
@@ -109,23 +111,39 @@ int main(int argc, char const *argv[])
             Mat histImg(512, 1024, CV_8UC1, Scalar(0, 0, 0));
             Mat histImg1(512, 1024, CV_8UC1, Scalar(0, 0, 0));
             Mat outImg = gray.clone();
+
             if (equalized)
+            {
+                timeNow = system_clock::now();
+                auto start_equalization_time = duration_cast<milliseconds>(timeNow.time_since_epoch()).count();
                 equalizeHist(gray, outImg);
+                timeNow = system_clock::now();
+                auto end_equalization_time = duration_cast<milliseconds>(timeNow.time_since_epoch()).count();
+                int equalization_time = end_equalization_time - start_equalization_time;
+                overall_time_equalized += equalization_time;
+                frame_counter_equalized ++;
+            }
+
             make_hist_image(outImg, histImg);
             imshow("hist", histImg);
             imshow("frame", outImg);
             timeNow = system_clock::now();
             auto endTime = duration_cast<milliseconds>(timeNow.time_since_epoch()).count();
             int execTime = endTime - startTime;
+            std::cout << "Processing time of one frame: " << execTime << "ms" << std::endl;
             int timeout = max(1, (int)(delay - execTime));
             int k = waitKey(timeout);
             if (k == 113) // 'q'
             {
+                std::cout << "Mean processing time of one equalized frame: " << (double)overall_time_equalized/(double)frame_counter_equalized << "ms" << std::endl;
                 not_terminated = false;
                 break;
             }
             if (k == 101)
+            {
                 equalized = !equalized;
+                std::cout << "Equalized: " << equalized << std::endl;
+            }
         }
     }
     return 0;

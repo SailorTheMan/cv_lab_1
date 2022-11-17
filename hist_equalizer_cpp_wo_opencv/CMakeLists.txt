@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 project(hist_equalizer)
+set(CMAKE_CXX_FLAGS_DEBUG "-Ofast")
 find_package( OpenCV REQUIRED)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 add_executable( hist_equalizer hist_equalizer.cpp )

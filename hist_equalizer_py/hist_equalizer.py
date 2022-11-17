@@ -18,6 +18,8 @@ def make_hist_image(src, hist_w, hist_h, hist_size):
     return histImage
 
 not_terminated = True
+overallTime = 0
+frameCounter = 0
 while (not_terminated):
     cap = cv.VideoCapture('/home/sailor/itmo_labs/cv/lab_1/samples/1.mp4')
     fps = cap.get(cv.CAP_PROP_FPS)
@@ -31,7 +33,12 @@ while (not_terminated):
             break
         src = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         if equalized:
+            startEqualizationTime = current_milli_time()
             src = cv.equalizeHist(src)
+            endEqualizationTime = current_milli_time()
+            equalizationTime = endEqualizationTime - startEqualizationTime
+            overallTime += equalizationTime
+            frameCounter += 1
         srcHistImage = make_hist_image(src, 1024, 400, 256)
         cv.imshow('Source image', src)
         cv.imshow("Source Hist", srcHistImage)
@@ -39,10 +46,12 @@ while (not_terminated):
         timeout = max(1, round(delay - execTime))
         k = cv.waitKey(timeout)
         if k == ord('q'):
+            print("Mean equalization time: ", overallTime / frameCounter, "ms")
             not_terminated = False
             break
         if k == ord('e'):
             equalized = not equalized
+            print("Equalized: ", equalized)
 
     cap.release()
 cv.destroyAllWindows()
